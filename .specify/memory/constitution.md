@@ -1,50 +1,60 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# PDF Sign Constitution
+
+<!-- Sync Impact Report: Version 1.0.0 (initial ratification) -->
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. React Component Library
+All UI built as modular, reusable React components. Each component must:
+- Accept props for configuration and behavior
+- Render independently without side effects
+- Style exclusively with Tailwind CSS classes (no inline styles or CSS modules)
+- Be located in `src/components/` with clear, descriptive file names
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Simplicity First (No Over-Engineering)
+Straight JavaScript, no TypeScript. Follow YAGNI (You Aren't Gonna Need It):
+- Do not add abstractions until needed
+- Avoid complex state management solutions until the app requires it
+- Use plain functions and objects before introducing layers of architecture
+- Prefer straightforward implementations over clever patterns
+- Rationale: Greenfield projects benefit from moving fast; add structure only when patterns emerge
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Accessibility & User Experience
+Every feature must work accessibly:
+- Semantic HTML structures (button, input, form, etc.—not divs for everything)
+- Keyboard navigation for all interactive elements
+- Focus management and indication (visible focus states)
+- Clear, human-readable error messages
+- Rationale: Accessibility is not optional; it ensures the app is usable by all and future-proofs the codebase
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Progressive Functionality
+Build features that work at a baseline, then enhance:
+- Core PDF signing must work without JavaScript enhancements
+- Graceful degradation: if a feature fails, the rest of the app continues
+- Performance matters: optimize bundle size and runtime performance
+- Test features manually in the target browser environment before considering them "done"
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Development Workflow
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+All changes start in feature branches. Code review is collaborative, not gatekeeping:
+- Commit messages should explain *why* a change exists, not just *what* changed
+- Keep commits focused: one logical change per commit when possible
+- Before merging to `main`, verify the feature works end-to-end in a browser
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+**Constitution Authority**: This constitution is the source of truth for how we build pdf-sign. All architectural decisions and code reviews reference these principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendment Process**: Changes to this constitution require:
+- Clear articulation of which principle is changing and why
+- Agreement from the team that the new principle solves a real problem
+- Update to `LAST_AMENDED_DATE` and `CONSTITUTION_VERSION` with semantic versioning
+
+**Versioning Policy**:
+- MAJOR: Principle removal or redefinition (backward-incompatible governance change)
+- MINOR: New principle added or significant clarification to existing principle
+- PATCH: Wording, typo fixes, or minor clarifications (non-semantic)
+
+**Compliance Review**: Periodically (at sprint/milestone boundaries), review open PRs and merged code against these principles. Flag violations early.
+
+**Version**: 1.0.0 | **Ratified**: 2026-04-07 | **Last Amended**: 2026-04-07
