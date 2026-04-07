@@ -1,0 +1,175 @@
+/**
+ * Drawing Component Styles
+ * Tailwind CSS-based styling for drawing canvas and toolbar controls
+ */
+
+/* Drawing Canvas Overlay */
+.drawing-canvas {
+  @apply absolute top-0 left-0 z-10;
+  cursor: crosshair;
+  display: block;
+  touch-action: none;
+}
+
+.drawing-canvas.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.drawing-canvas.enabled {
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+/* Drawing Toolbar */
+.drawing-toolbar {
+  @apply flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg shadow-sm;
+}
+
+.drawing-toolbar button {
+  @apply px-3 py-2 text-sm font-medium rounded transition-colors;
+}
+
+.drawing-toolbar button:hover {
+  @apply bg-gray-100;
+}
+
+.drawing-toolbar button:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Drawing Mode Toggle Button */
+.draw-toggle-btn {
+  @apply px-3 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors;
+}
+
+.draw-toggle-btn.active {
+  @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+/* Color Picker */
+.color-picker-dropdown {
+  @apply relative;
+}
+
+.color-picker-button {
+  @apply flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+}
+
+.color-preview {
+  @apply w-6 h-6 rounded border border-gray-400;
+}
+
+.color-palette {
+  @apply absolute top-full left-0 mt-1 flex gap-2 p-2 bg-white border border-gray-300 rounded shadow-lg z-20;
+}
+
+.color-option {
+  @apply w-8 h-8 rounded border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-500 hover:scale-110;
+}
+
+.color-option.selected {
+  @apply border-2 border-gray-800 ring-2 ring-blue-500 ring-offset-1;
+}
+
+/* Line Width Selector */
+.line-width-selector {
+  @apply relative;
+}
+
+.line-width-button {
+  @apply flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+}
+
+.width-preview {
+  @apply w-10 h-6 border border-gray-300 rounded flex items-center justify-center;
+}
+
+.width-indicator {
+  @apply bg-gray-800;
+}
+
+.width-options {
+  @apply absolute top-full left-0 mt-1 flex flex-col gap-2 p-2 bg-white border border-gray-300 rounded shadow-lg z-20;
+}
+
+.width-option {
+  @apply flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none;
+}
+
+.width-option.selected {
+  @apply bg-blue-50 border-l-4 border-blue-500;
+}
+
+.width-option-preview {
+  @apply w-8 h-6 border border-gray-300 rounded flex items-center justify-center;
+}
+
+/* Undo/Redo Buttons */
+.undo-redo-group {
+  @apply flex items-center gap-1;
+}
+
+.undo-btn,
+.redo-btn {
+  @apply px-2 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+}
+
+.undo-btn:hover:not(:disabled),
+.redo-btn:hover:not(:disabled) {
+  @apply bg-gray-300;
+}
+
+.undo-btn:focus,
+.redo-btn:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Clear Page Button */
+.clear-btn {
+  @apply px-3 py-2 bg-red-200 text-red-800 rounded hover:bg-red-300 transition-colors;
+}
+
+.clear-btn:focus {
+  @apply outline-none ring-2 ring-red-500 ring-offset-2;
+}
+
+/* Toolbar Separator */
+.toolbar-separator {
+  @apply w-px h-6 bg-gray-300;
+}
+
+/* Status Indicators */
+.drawing-status {
+  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium;
+}
+
+.drawing-status.active {
+  @apply text-blue-600;
+}
+
+.status-dot {
+  @apply w-2 h-2 rounded-full bg-current;
+}
+
+/* Cursor feedback */
+.drawing-cursor-active {
+  cursor: crosshair;
+}
+
+.drawing-cursor-inactive {
+  cursor: default;
+}
+
+/* Accessibility: Focus visible states */
+.drawing-toolbar button:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.color-option:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.width-option:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}

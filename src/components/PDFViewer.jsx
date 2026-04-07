@@ -1,9 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import { usePDFViewer } from '../hooks/usePDFViewer';
+import { useDrawing } from '../hooks/useDrawing';
 import { PDFFileInput } from './PDFFileInput';
 import { PDFCanvas } from './PDFCanvas';
 import { PDFPageNav } from './PDFPageNav';
 import { BookView } from './BookView';
+import { DrawingToolbar } from './DrawingToolbar';
+import { DrawingProvider } from './DrawingContext';
 
 /**
  * Main PDF viewer component
@@ -13,12 +16,14 @@ import { BookView } from './BookView';
  */
 export function PDFViewer() {
   const { pdfDocument, viewerState, actions } = usePDFViewer();
+  const drawingState = useDrawing();
   const containerRef = useRef(null);
 
   // Handle scroll wheel and keyboard navigation (single page view only)
   useEffect(() => {
     if (!pdfDocument || pdfDocument.error || pdfDocument.numPages <= 1) return;
     if (viewerState.viewMode === 'book') return; // Skip navigation in book view
+    if (drawingState.isDrawingEnabled) return; // Skip navigation when drawing mode is active
 
     const container = containerRef.current;
     if (!container) return;
@@ -57,31 +62,68 @@ export function PDFViewer() {
       container.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [pdfDocument, viewerState.viewMode, actions]);
+  }, [pdfDocument, viewerState.viewMode, actions, drawingState.isDrawingEnabled]);
+
+  // Handle keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyboardShortcuts = (e) => {
+      // Ctrl+Z or Cmd+Z for undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        drawingState.undo();
+      }
+      // Ctrl+Y or Ctrl+Shift+Z or Cmd+Shift+Z for redo
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        drawingState.redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    return () => window.removeEventListener('keydown', handleKeyboardShortcuts);
+  }, [drawingState]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Header with file input and view mode toggle */}
-      <header className="bg-white border-b border-gray-200 p-4 shadow-sm">
-        <div className="flex justify-between items-center gap-4">
-          <div className="flex-1">
-            <PDFFileInput
-              onSelect={actions.selectFile}
-              isLoading={viewerState.isLoading}
-              error={viewerState.error}
-            />
+    <DrawingProvider drawingState={drawingState}>
+      <div className="flex flex-col h-screen bg-gray-50">
+        {/* Header with file input and view mode toggle */}
+        <header className="bg-white border-b border-gray-200 p-4 shadow-sm">
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-between items-center gap-4">
+              <div className="flex-1">
+                <PDFFileInput
+                  onSelect={actions.selectFile}
+                  isLoading={viewerState.isLoading}
+                  error={viewerState.error}
+                />
+              </div>
+              {pdfDocument && !pdfDocument.error && (
+                <button
+                  onClick={actions.toggleViewMode}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors whitespace-nowrap"
+                  title={viewerState.viewMode === 'single' ? 'Switch to book view' : 'Switch to single page view'}
+                >
+                  {viewerState.viewMode === 'single' ? '📖 Book View' : '📄 Single Page'}
+                </button>
+              )}
+            </div>
+            {pdfDocument && !pdfDocument.error && (
+              <DrawingToolbar
+                isDrawingEnabled={drawingState.isDrawingEnabled}
+                onToggleDrawing={drawingState.toggleDrawing}
+                currentColor={drawingState.currentColor}
+                onColorChange={drawingState.setCurrentColor}
+                currentWidth={drawingState.currentWidth}
+                onWidthChange={drawingState.setCurrentWidth}
+                canUndo={drawingState.canUndo}
+                canRedo={drawingState.canRedo}
+                onUndo={drawingState.undo}
+                onRedo={drawingState.redo}
+                onClearPage={drawingState.clearPage}
+              />
+            )}
           </div>
-          {pdfDocument && !pdfDocument.error && (
-            <button
-              onClick={actions.toggleViewMode}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors whitespace-nowrap"
-              title={viewerState.viewMode === 'single' ? 'Switch to book view' : 'Switch to single page view'}
-            >
-              {viewerState.viewMode === 'single' ? '📖 Book View' : '📄 Single Page'}
-            </button>
-          )}
-        </div>
-      </header>
+        </header>
 
       {/* Main content area */}
       {pdfDocument && !pdfDocument.error ? (
@@ -137,6 +179,7 @@ export function PDFViewer() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DrawingProvider>
   );
 }
