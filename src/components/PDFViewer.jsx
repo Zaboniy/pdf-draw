@@ -88,12 +88,25 @@ export function PDFViewer() {
         {/* Header with file input and drawing toolbar */}
         <header className="bg-white border-b border-gray-200 p-4 shadow-sm">
           <div className="flex flex-col gap-3">
-            <div className="flex-1">
-              <PDFFileInput
-                onSelect={actions.selectFile}
-                isLoading={viewerState.isLoading}
-                error={viewerState.error}
-              />
+            <div className="flex justify-between items-center gap-4">
+              <div className="flex-1">
+                <PDFFileInput
+                  onSelect={actions.selectFile}
+                  isLoading={viewerState.isLoading}
+                  error={viewerState.error}
+                />
+              </div>
+              {pdfDocument && !pdfDocument.error && drawingState.hasDrawings && (
+                <button
+                  onClick={() => {
+                    drawingState.savePDF(pdfDocument);
+                  }}
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors whitespace-nowrap flex items-center gap-2"
+                  title="Save PDF with drawings"
+                >
+                  💾 Save PDF
+                </button>
+              )}
             </div>
             {pdfDocument && !pdfDocument.error && (
               <DrawingToolbar

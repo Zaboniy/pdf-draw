@@ -31,7 +31,8 @@ export function PDFCanvas({ pdfDocument, currentPage, zoomLevel, onNumPagesChang
   };
 
   // Update drawing context when page changes
-  React.useEffect(() => {
+  // Use useLayoutEffect to ensure setCurrentPage runs before render
+  React.useLayoutEffect(() => {
     drawingContext.setCurrentPage(currentPage);
   }, [currentPage, drawingContext]);
 
@@ -58,7 +59,7 @@ export function PDFCanvas({ pdfDocument, currentPage, zoomLevel, onNumPagesChang
         <DrawingErrorBoundary>
           <DrawingCanvas
             isEnabled={drawingContext.isDrawingEnabled}
-            strokes={drawingContext.getCurrentStrokes()}
+            strokes={drawingContext.getStrokesForPage(currentPage)}
             onStrokeEnd={handleStrokeEnd}
             currentColor={drawingContext.currentColor}
             currentWidth={drawingContext.currentWidth}

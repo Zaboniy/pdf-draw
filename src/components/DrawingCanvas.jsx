@@ -27,7 +27,7 @@ export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, 
       canvas.width = pageElement.offsetWidth;
       canvas.height = pageElement.offsetHeight;
 
-      // Redraw
+      // Redraw - use the current strokes from the ref
       const ctx = canvas.getContext('2d');
       if (ctx) {
         redrawCanvas(ctx, strokes);
@@ -49,7 +49,7 @@ export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, 
     }
 
     return () => resizeObserver.disconnect();
-  }, [containerRef]);
+  }, [containerRef, strokes]);
 
   // Redraw canvas when strokes change
   useEffect(() => {
