@@ -4,7 +4,6 @@ import { useDrawing } from '../hooks/useDrawing';
 import { PDFFileInput } from './PDFFileInput';
 import { PDFCanvas } from './PDFCanvas';
 import { PDFPageNav } from './PDFPageNav';
-import { BookView } from './BookView';
 import { DrawingToolbar } from './DrawingToolbar';
 import { DrawingProvider } from './DrawingContext';
 
@@ -19,10 +18,9 @@ export function PDFViewer() {
   const drawingState = useDrawing();
   const containerRef = useRef(null);
 
-  // Handle scroll wheel and keyboard navigation (single page view only)
+  // Handle scroll wheel and keyboard navigation
   useEffect(() => {
     if (!pdfDocument || pdfDocument.error || pdfDocument.numPages <= 1) return;
-    if (viewerState.viewMode === 'book') return; // Skip navigation in book view
     if (drawingState.isDrawingEnabled) return; // Skip navigation when drawing mode is active
 
     const container = containerRef.current;
@@ -62,7 +60,7 @@ export function PDFViewer() {
       container.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [pdfDocument, viewerState.viewMode, actions, drawingState.isDrawingEnabled]);
+  }, [pdfDocument, actions, drawingState.isDrawingEnabled]);
 
   // Handle keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -86,26 +84,15 @@ export function PDFViewer() {
   return (
     <DrawingProvider drawingState={drawingState}>
       <div className="flex flex-col h-screen bg-gray-50">
-        {/* Header with file input and view mode toggle */}
+        {/* Header with file input and drawing toolbar */}
         <header className="bg-white border-b border-gray-200 p-4 shadow-sm">
           <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center gap-4">
-              <div className="flex-1">
-                <PDFFileInput
-                  onSelect={actions.selectFile}
-                  isLoading={viewerState.isLoading}
-                  error={viewerState.error}
-                />
-              </div>
-              {pdfDocument && !pdfDocument.error && (
-                <button
-                  onClick={actions.toggleViewMode}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors whitespace-nowrap"
-                  title={viewerState.viewMode === 'single' ? 'Switch to book view' : 'Switch to single page view'}
-                >
-                  {viewerState.viewMode === 'single' ? '📖 Book View' : '📄 Single Page'}
-                </button>
-              )}
+            <div className="flex-1">
+              <PDFFileInput
+                onSelect={actions.selectFile}
+                isLoading={viewerState.isLoading}
+                error={viewerState.error}
+              />
             </div>
             {pdfDocument && !pdfDocument.error && (
               <DrawingToolbar
@@ -128,40 +115,24 @@ export function PDFViewer() {
       {/* Main content area */}
       {pdfDocument && !pdfDocument.error ? (
         <>
-          {/* Render based on view mode */}
-          {viewerState.viewMode === 'single' ? (
-            <>
-              {/* Single Page View - scrollable container */}
-              <div ref={containerRef} className="flex-1 overflow-auto">
-                <PDFCanvas
-                  pdfDocument={pdfDocument}
-                  currentPage={viewerState.currentPage}
-                  zoomLevel={viewerState.zoomLevel}
-                  onNumPagesChange={actions.setNumPages}
-                />
-              </div>
-              {/* Page Navigation Footer */}
-              {pdfDocument.numPages > 0 && (
-                <PDFPageNav
-                  currentPage={viewerState.currentPage}
-                  totalPages={pdfDocument.numPages}
-                  onPreviousPage={actions.goPreviousPage}
-                  onNextPage={actions.goNextPage}
-                  onGoToPage={actions.goToPage}
-                />
-              )}
-            </>
-          ) : (
-            <>
-              {/* Book View - continuous scrolling */}
-              <div ref={containerRef} className="flex-1 overflow-auto">
-                <BookView
-                  pdfDocument={pdfDocument}
-                  zoomLevel={viewerState.zoomLevel}
-                  onNumPagesChange={actions.setNumPages}
-                />
-              </div>
-            </>
+          {/* Single Page View - scrollable container */}
+          <div ref={containerRef} className="flex-1 overflow-auto">
+            <PDFCanvas
+              pdfDocument={pdfDocument}
+              currentPage={viewerState.currentPage}
+              zoomLevel={viewerState.zoomLevel}
+              onNumPagesChange={actions.setNumPages}
+            />
+          </div>
+          {/* Page Navigation Footer */}
+          {pdfDocument.numPages > 0 && (
+            <PDFPageNav
+              currentPage={viewerState.currentPage}
+              totalPages={pdfDocument.numPages}
+              onPreviousPage={actions.goPreviousPage}
+              onNextPage={actions.goNextPage}
+              onGoToPage={actions.goToPage}
+            />
           )}
         </>
       ) : pdfDocument?.error ? (
