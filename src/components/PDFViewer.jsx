@@ -4,6 +4,7 @@ import { useDrawing } from '../hooks/useDrawing';
 import { PDFFileInput } from './PDFFileInput';
 import { PDFCanvas } from './PDFCanvas';
 import { PDFPageNav } from './PDFPageNav';
+import { ThumbnailPanel } from './ThumbnailPanel';
 import { DrawingToolbar } from './DrawingToolbar';
 import { DrawingProvider } from './DrawingContext';
 
@@ -112,29 +113,46 @@ export function PDFViewer() {
           </div>
         </header>
 
-      {/* Main content area */}
+      {/* Main content area with thumbnails sidebar */}
       {pdfDocument && !pdfDocument.error ? (
-        <>
-          {/* Single Page View - scrollable container */}
-          <div ref={containerRef} className="flex-1 overflow-auto">
-            <PDFCanvas
+        <div className="flex flex-1 overflow-hidden">
+          {/* Thumbnail sidebar */}
+          <div className="w-32 flex-shrink-0 flex flex-col">
+            <ThumbnailPanel
               pdfDocument={pdfDocument}
               currentPage={viewerState.currentPage}
-              zoomLevel={viewerState.zoomLevel}
-              onNumPagesChange={actions.setNumPages}
+              onPageSelect={actions.goToPage}
+              onLoadSuccess={(pdf) => {
+                if (actions.setNumPages) {
+                  actions.setNumPages(pdf.numPages);
+                }
+              }}
             />
           </div>
-          {/* Page Navigation Footer */}
-          {pdfDocument.numPages > 0 && (
-            <PDFPageNav
-              currentPage={viewerState.currentPage}
-              totalPages={pdfDocument.numPages}
-              onPreviousPage={actions.goPreviousPage}
-              onNextPage={actions.goNextPage}
-              onGoToPage={actions.goToPage}
-            />
-          )}
-        </>
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Single Page View - scrollable container */}
+            <div ref={containerRef} className="flex-1 overflow-auto">
+              <PDFCanvas
+                pdfDocument={pdfDocument}
+                currentPage={viewerState.currentPage}
+                zoomLevel={viewerState.zoomLevel}
+                onNumPagesChange={actions.setNumPages}
+              />
+            </div>
+            {/* Page Navigation Footer */}
+            {pdfDocument.numPages > 0 && (
+              <PDFPageNav
+                currentPage={viewerState.currentPage}
+                totalPages={pdfDocument.numPages}
+                onPreviousPage={actions.goPreviousPage}
+                onNextPage={actions.goNextPage}
+                onGoToPage={actions.goToPage}
+              />
+            )}
+          </div>
+        </div>
       ) : pdfDocument?.error ? (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
