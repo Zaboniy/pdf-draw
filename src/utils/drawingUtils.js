@@ -116,11 +116,45 @@ export function createOverlayCanvas(container) {
 }
 
 /**
+ * Draw a bounding box rectangle around a stroke
+ * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
+ * @param {Array<{x, y}>} points - Array of coordinate objects of the stroke
+ */
+export function drawBoundingBox(ctx, points) {
+  if (!ctx || !points || points.length === 0) return;
+
+  const xCoords = points.map(p => p.x);
+  const yCoords = points.map(p => p.y);
+
+  const minX = Math.min(...xCoords);
+  const maxX = Math.max(...xCoords);
+  const minY = Math.min(...yCoords);
+  const maxY = Math.max(...yCoords);
+
+  // Add padding around the bounding box
+  const padding = 4;
+
+  ctx.strokeStyle = '#999999'; // Thin grayish color
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]); // Dashed line for better visibility
+
+  ctx.strokeRect(
+    minX - padding,
+    minY - padding,
+    maxX - minX + padding * 2,
+    maxY - minY + padding * 2
+  );
+
+  ctx.setLineDash([]); // Reset to solid
+}
+
+/**
  * Redraw all strokes on a canvas
  * @param {CanvasRenderingContext2D} ctx - Canvas 2D context
  * @param {Array} strokes - Array of stroke objects { points, color, width }
+ * @param {string} selectedStrokeId - ID of the selected stroke (optional)
  */
-export function redrawCanvas(ctx, strokes) {
+export function redrawCanvas(ctx, strokes, selectedStrokeId = null) {
   if (!ctx) return;
 
   // Clear canvas
@@ -130,6 +164,11 @@ export function redrawCanvas(ctx, strokes) {
   if (strokes && Array.isArray(strokes)) {
     strokes.forEach((stroke) => {
       drawStroke(ctx, stroke.points, stroke.color, stroke.width);
+
+      // Draw bounding box if this stroke is selected
+      if (selectedStrokeId && stroke.id === selectedStrokeId) {
+        drawBoundingBox(ctx, stroke.points);
+      }
     });
   }
 }

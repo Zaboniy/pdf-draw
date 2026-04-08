@@ -47,7 +47,7 @@ export function DrawingCanvas({
       // Redraw - use the current strokes from the ref
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        redrawCanvas(ctx, strokes);
+        redrawCanvas(ctx, strokes, selectedStrokeId);
       }
     });
 
@@ -61,12 +61,12 @@ export function DrawingCanvas({
       canvas.height = pageElement.offsetHeight;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        redrawCanvas(ctx, strokes);
+        redrawCanvas(ctx, strokes, selectedStrokeId);
       }
     }
 
     return () => resizeObserver.disconnect();
-  }, [containerRef, strokes]);
+  }, [containerRef, strokes, selectedStrokeId]);
 
   // Redraw canvas when strokes change
   useEffect(() => {
@@ -75,9 +75,9 @@ export function DrawingCanvas({
 
     const ctx = canvas.getContext('2d');
     if (ctx && canvas.width > 0 && canvas.height > 0) {
-      redrawCanvas(ctx, strokes);
+      redrawCanvas(ctx, strokes, selectedStrokeId);
     }
-  }, [strokes]);
+  }, [strokes, selectedStrokeId]);
 
   // Handle mouse down - start drawing or moving
   const handleMouseDown = (e) => {
@@ -93,6 +93,9 @@ export function DrawingCanvas({
         onSelectStroke(strokeId);
         isMovingRef.current = true;
         moveStartRef.current = { x, y };
+      } else {
+        // Deselect if clicking on empty area
+        onSelectStroke(null);
       }
     } else if (isEnabled) {
       // Draw mode
@@ -130,7 +133,7 @@ export function DrawingCanvas({
       currentPointsRef.current.push({ x, y });
 
       // Redraw all previous strokes and current stroke
-      redrawCanvas(ctx, strokes);
+      redrawCanvas(ctx, strokes, selectedStrokeId);
       drawStroke(ctx, currentPointsRef.current, currentColor, currentWidth);
     }
   };
@@ -164,7 +167,7 @@ export function DrawingCanvas({
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext('2d');
       if (ctx) {
-        redrawCanvas(ctx, strokes);
+        redrawCanvas(ctx, strokes, selectedStrokeId);
       }
     }
   };

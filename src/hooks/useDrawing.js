@@ -191,6 +191,7 @@ export function useDrawing() {
 
   /**
    * Paste stroke from clipboard to current page
+   * Positions pasted stroke at top-left corner of the page
    */
   const pasteStroke = useCallback(() => {
     if (!clipboard || !clipboard.stroke) return;
@@ -199,11 +200,28 @@ export function useDrawing() {
     setDrawingLayers((prev) => {
       const layer = { ...prev[pageNumber] } || { strokes: [], pastStates: [], futureStates: [] };
 
-      // Create a copy of the stroke with a new ID
+      // Find bounds of the original stroke
+      const points = clipboard.stroke.points;
+      if (!points || points.length === 0) return prev;
+
+      const minX = Math.min(...points.map(p => p.x));
+      const minY = Math.min(...points.map(p => p.y));
+
+      // Calculate offset to move to top-left (with small margin)
+      const targetX = 10;
+      const targetY = 10;
+      const offsetX = targetX - minX;
+      const offsetY = targetY - minY;
+
+      // Create a copy of the stroke with new ID and offset points
       const pastedStroke = {
         ...clipboard.stroke,
         id: `stroke-${Date.now()}-${Math.random()}`,
         timestamp: Date.now(),
+        points: points.map(point => ({
+          x: point.x + offsetX,
+          y: point.y + offsetY,
+        })),
       };
 
       // Add to past states for undo
