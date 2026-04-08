@@ -68,8 +68,13 @@ export function PDFCanvas({ pdfDocument, currentPage, zoomLevel, onNumPagesChang
         <DrawingErrorBoundary>
           <DrawingCanvas
             isEnabled={drawingContext.isDrawingEnabled}
+            isSelectEnabled={drawingContext.isSelectEnabled}
             strokes={drawingContext.getStrokesForPage(currentPage)}
+            selectedStrokeId={drawingContext.selectedStrokeId}
             onStrokeEnd={handleStrokeEnd}
+            onSelectStroke={drawingContext.selectStroke}
+            onMoveStroke={drawingContext.moveStroke}
+            findStrokeAtPosition={drawingContext.findStrokeAtPosition}
             currentColor={drawingContext.currentColor}
             currentWidth={drawingContext.currentWidth}
             containerRef={containerRef}

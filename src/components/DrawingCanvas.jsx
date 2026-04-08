@@ -7,10 +7,27 @@
 import { useEffect, useRef, useState } from 'react';
 import { drawStroke, redrawCanvas, viewportToCanvasCoords, detectPageAtCursor } from '../utils/drawingUtils';
 
-export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, currentColor, currentWidth, containerRef }) {
+export function DrawingCanvas({
+  isEnabled,
+  isSelectEnabled,
+  strokes,
+  selectedStrokeId,
+  onStrokeStart,
+  onStrokeEnd,
+  onSelectStroke,
+  onMoveStroke,
+  findStrokeAtPosition,
+  currentColor,
+  currentWidth,
+  containerRef,
+}) {
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);
   const currentPointsRef = useRef([]);
+
+  // Select mode refs
+  const isMovingRef = useRef(false);
+  const moveStartRef = useRef(null);
 
   // Initialize canvas and set up resize observer
   useEffect(() => {
@@ -62,47 +79,79 @@ export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, 
     }
   }, [strokes]);
 
-  // Handle mouse down - start drawing
+  // Handle mouse down - start drawing or moving
   const handleMouseDown = (e) => {
-    if (!isEnabled) return;
-
-    isDrawingRef.current = true;
-    currentPointsRef.current = [];
+    if (!isEnabled && !isSelectEnabled) return;
 
     const canvas = canvasRef.current;
     const { x, y } = viewportToCanvasCoords(e.clientX, e.clientY, canvas);
 
-    currentPointsRef.current.push({ x, y });
-  };
-
-  // Handle mouse move - draw stroke
-  const handleMouseMove = (e) => {
-    if (!isEnabled || !isDrawingRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!ctx) return;
-
-    const { x, y } = viewportToCanvasCoords(e.clientX, e.clientY, canvas);
-    currentPointsRef.current.push({ x, y });
-
-    // Redraw all previous strokes and current stroke
-    redrawCanvas(ctx, strokes);
-    drawStroke(ctx, currentPointsRef.current, currentColor, currentWidth);
-  };
-
-  // Handle mouse up - finish drawing
-  const handleMouseUp = () => {
-    if (!isEnabled || !isDrawingRef.current) return;
-
-    isDrawingRef.current = false;
-
-    // Only save stroke if it has multiple points
-    if (currentPointsRef.current.length > 1) {
-      onStrokeEnd(currentPointsRef.current, currentColor, currentWidth);
+    if (isSelectEnabled) {
+      // Move mode: try to select a stroke
+      const strokeId = findStrokeAtPosition(x, y);
+      if (strokeId) {
+        onSelectStroke(strokeId);
+        isMovingRef.current = true;
+        moveStartRef.current = { x, y };
+      }
+    } else if (isEnabled) {
+      // Draw mode
+      isDrawingRef.current = true;
+      currentPointsRef.current = [];
+      currentPointsRef.current.push({ x, y });
     }
+  };
 
-    currentPointsRef.current = [];
+  // Handle mouse move - draw stroke or move selected stroke
+  const handleMouseMove = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const { x, y } = viewportToCanvasCoords(e.clientX, e.clientY, canvas);
+
+    if (isSelectEnabled) {
+      // Move mode: update cursor based on whether hovering over a stroke
+      if (isMovingRef.current && moveStartRef.current && selectedStrokeId) {
+        // Currently dragging - move the stroke
+        const offsetX = x - moveStartRef.current.x;
+        const offsetY = y - moveStartRef.current.y;
+        onMoveStroke(selectedStrokeId, offsetX, offsetY);
+        moveStartRef.current = { x, y };
+      } else {
+        // Not dragging - check if hovering over a stroke to show appropriate cursor
+        const strokeAtPos = findStrokeAtPosition(x, y);
+        canvas.style.cursor = strokeAtPos ? 'grab' : 'default';
+      }
+    } else if (isEnabled && isDrawingRef.current) {
+      // Draw mode
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+
+      currentPointsRef.current.push({ x, y });
+
+      // Redraw all previous strokes and current stroke
+      redrawCanvas(ctx, strokes);
+      drawStroke(ctx, currentPointsRef.current, currentColor, currentWidth);
+    }
+  };
+
+  // Handle mouse up - finish drawing or moving
+  const handleMouseUp = () => {
+    if (isSelectEnabled && isMovingRef.current) {
+      // Finish moving
+      isMovingRef.current = false;
+      moveStartRef.current = null;
+    } else if (isEnabled && isDrawingRef.current) {
+      // Finish drawing
+      isDrawingRef.current = false;
+
+      // Only save stroke if it has multiple points
+      if (currentPointsRef.current.length > 1) {
+        onStrokeEnd(currentPointsRef.current, currentColor, currentWidth);
+      }
+
+      currentPointsRef.current = [];
+    }
   };
 
   // Handle mouse leave - cancel current stroke
@@ -150,7 +199,7 @@ export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, 
   return (
     <canvas
       ref={canvasRef}
-      className={`drawing-canvas ${isEnabled ? 'enabled' : 'disabled'}`}
+      className={`drawing-canvas ${isEnabled ? 'enabled' : ''} ${isSelectEnabled ? 'move-enabled' : ''}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -159,8 +208,8 @@ export function DrawingCanvas({ isEnabled, strokes, onStrokeStart, onStrokeEnd, 
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{
-        cursor: isEnabled ? 'crosshair' : 'default',
-        pointerEvents: isEnabled ? 'auto' : 'none',
+        cursor: isEnabled ? 'crosshair' : isSelectEnabled ? 'grab' : 'default',
+        pointerEvents: isEnabled || isSelectEnabled ? 'auto' : 'none',
       }}
     />
   );

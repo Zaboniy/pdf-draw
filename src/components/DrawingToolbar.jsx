@@ -3,13 +3,15 @@
  * Integrates drawing controls: toggle, color picker, line width selector, undo/redo, clear
  */
 
-import { Pencil, CheckCircle, RotateCcw, RotateCw, Trash2 } from 'lucide-react';
+import { Pencil, CheckCircle, Move, RotateCcw, RotateCw, Trash2 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { LineWidthSelector } from './LineWidthSelector';
 
 export function DrawingToolbar({
   isDrawingEnabled,
   onToggleDrawing,
+  isSelectEnabled,
+  onToggleSelect,
   currentColor,
   onColorChange,
   currentWidth,
@@ -41,6 +43,18 @@ export function DrawingToolbar({
             Draw
           </>
         )}
+      </button>
+
+      {/* Select Mode Toggle */}
+      <button
+        className={`select-toggle-btn ${isSelectEnabled ? 'active' : ''}`}
+        onClick={onToggleSelect}
+        title={isSelectEnabled ? 'Click to stop selecting' : 'Click to select drawings'}
+        aria-label={isSelectEnabled ? 'Stop select mode' : 'Start select mode'}
+        aria-pressed={isSelectEnabled}
+      >
+        <Move size={16} />
+        Select
       </button>
 
       {/* Separator */}
@@ -88,12 +102,18 @@ export function DrawingToolbar({
         Clear
       </button>
 
-      {/* Drawing Status Indicator */}
+      {/* Status Indicator */}
       <div className="drawing-status" aria-live="polite" aria-atomic="true">
         {isDrawingEnabled && (
           <>
             <span className="status-dot" />
             <span>Ready to draw</span>
+          </>
+        )}
+        {isSelectEnabled && (
+          <>
+            <span className="status-dot" />
+            <span>Ready to select</span>
           </>
         )}
       </div>

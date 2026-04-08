@@ -64,7 +64,7 @@ export function PDFViewer() {
     };
   }, [pdfDocument, actions, drawingState.isDrawingEnabled]);
 
-  // Handle keyboard shortcuts for undo/redo
+  // Handle keyboard shortcuts for undo/redo/copy/paste
   useEffect(() => {
     const handleKeyboardShortcuts = (e) => {
       // Ctrl+Z or Cmd+Z for undo
@@ -76,6 +76,16 @@ export function PDFViewer() {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
         e.preventDefault();
         drawingState.redo();
+      }
+      // Ctrl+C or Cmd+C for copy
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        e.preventDefault();
+        drawingState.copyStroke();
+      }
+      // Ctrl+V or Cmd+V for paste
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+        e.preventDefault();
+        drawingState.pasteStroke();
       }
     };
 
@@ -136,6 +146,8 @@ export function PDFViewer() {
               <DrawingToolbar
                 isDrawingEnabled={drawingState.isDrawingEnabled}
                 onToggleDrawing={drawingState.toggleDrawing}
+                isSelectEnabled={drawingState.isSelectEnabled}
+                onToggleSelect={drawingState.toggleSelect}
                 currentColor={drawingState.currentColor}
                 onColorChange={drawingState.setCurrentColor}
                 currentWidth={drawingState.currentWidth}
