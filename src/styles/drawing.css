@@ -1,11 +1,14 @@
 /**
  * Drawing Component Styles
- * Tailwind CSS-based styling for drawing canvas and toolbar controls
+ * Modern design system with CSS variables
  */
 
 /* Drawing Canvas Overlay */
 .drawing-canvas {
-  @apply absolute top-0 left-0 z-10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
   cursor: crosshair;
   display: block;
   touch-action: none;
@@ -23,133 +26,346 @@
 
 /* Drawing Toolbar */
 .drawing-toolbar {
-  @apply flex items-center gap-2 p-2 bg-white border border-gray-300 rounded-lg shadow-sm;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
 }
 
 .drawing-toolbar button {
-  @apply px-3 py-2 text-sm font-medium rounded transition-colors;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.375rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .drawing-toolbar button:hover {
-  @apply bg-gray-100;
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
 }
 
 .drawing-toolbar button:focus {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 /* Drawing Mode Toggle Button */
 .draw-toggle-btn {
-  @apply px-3 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.draw-toggle-btn:hover {
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
 }
 
 .draw-toggle-btn.active {
-  @apply bg-blue-500 text-white hover:bg-blue-600;
+  background: var(--accent);
+  color: white;
+}
+
+.draw-toggle-btn.active:hover {
+  background: var(--accent-hover);
 }
 
 /* Color Picker */
 .color-picker-dropdown {
-  @apply relative;
+  position: relative;
 }
 
 .color-picker-button {
-  @apply flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-weight: 500;
+}
+
+.color-picker-button:hover {
+  background: var(--bg-sidebar);
+  border-color: var(--border-strong);
+}
+
+.color-picker-button:focus {
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 .color-preview {
-  @apply w-6 h-6 rounded border border-gray-400;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
+  border: 2px solid var(--border-strong);
 }
 
 .color-palette {
-  @apply absolute top-full left-0 mt-1 flex gap-2 p-2 bg-white border border-gray-300 rounded shadow-lg z-20;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 20;
 }
 
 .color-option {
-  @apply w-8 h-8 rounded border-2 border-gray-300 cursor-pointer transition-all hover:border-gray-500 hover:scale-110;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.color-option:hover {
+  border-color: var(--text-muted);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .color-option.selected {
-  @apply border-2 border-gray-800 ring-2 ring-blue-500 ring-offset-1;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 /* Line Width Selector */
 .line-width-selector {
-  @apply relative;
+  position: relative;
 }
 
 .line-width-button {
-  @apply flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-weight: 500;
+}
+
+.line-width-button:hover {
+  background: var(--bg-sidebar);
+  border-color: var(--border-strong);
+}
+
+.line-width-button:focus {
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 .width-preview {
-  @apply w-10 h-6 border border-gray-300 rounded flex items-center justify-center;
+  width: 2.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-sidebar);
 }
 
 .width-indicator {
-  @apply bg-gray-800;
+  background: var(--text-primary);
 }
 
 .width-options {
-  @apply absolute top-full left-0 mt-1 flex flex-col gap-2 p-2 bg-white border border-gray-300 rounded shadow-lg z-20;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 20;
 }
 
 .width-option {
-  @apply flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 cursor-pointer transition-colors focus:ring-2 focus:ring-blue-500 focus:outline-none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.width-option:hover {
+  background: var(--bg-sidebar);
+  color: var(--text-primary);
 }
 
 .width-option.selected {
-  @apply bg-blue-50 border-l-4 border-blue-500;
+  background: var(--accent-light);
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
+}
+
+.width-option:focus-visible {
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 .width-option-preview {
-  @apply w-8 h-6 border border-gray-300 rounded flex items-center justify-center;
+  width: 2rem;
+  height: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-sidebar);
 }
 
 /* Undo/Redo Buttons */
 .undo-redo-group {
-  @apply flex items-center gap-1;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .undo-btn,
 .redo-btn {
-  @apply px-2 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors;
+  padding: 0.5rem 0.5rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .undo-btn:hover:not(:disabled),
 .redo-btn:hover:not(:disabled) {
-  @apply bg-gray-300;
+  background: var(--bg-sidebar);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.undo-btn:disabled,
+.redo-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .undo-btn:focus,
 .redo-btn:focus {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 /* Clear Page Button */
 .clear-btn {
-  @apply px-3 py-2 bg-red-200 text-red-800 rounded hover:bg-red-300 transition-colors;
+  padding: 0.5rem 0.75rem;
+  background: var(--danger-light);
+  color: var(--danger);
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .clear-btn:focus {
-  @apply outline-none ring-2 ring-red-500 ring-offset-2;
+  outline: none;
+  ring: 2px solid var(--danger);
+  ring-offset: 2px;
 }
 
 /* Toolbar Separator */
 .toolbar-separator {
-  @apply w-px h-6 bg-gray-300;
+  width: 1px;
+  height: 1.5rem;
+  background: var(--border);
 }
 
 /* Status Indicators */
 .drawing-status {
-  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .drawing-status.active {
-  @apply text-blue-600;
+  color: var(--accent);
 }
 
 .status-dot {
-  @apply w-2 h-2 rounded-full bg-current;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Cursor feedback */
@@ -163,13 +379,13 @@
 
 /* Accessibility: Focus visible states */
 .drawing-toolbar button:focus-visible {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }
 
 .color-option:focus-visible {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
-}
-
-.width-option:focus-visible {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  outline: none;
+  ring: 2px solid var(--accent);
+  ring-offset: 2px;
 }

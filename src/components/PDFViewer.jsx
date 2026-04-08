@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { Save, FileText, AlertCircle } from 'lucide-react';
 import { usePDFViewer } from '../hooks/usePDFViewer';
 import { useDrawing } from '../hooks/useDrawing';
 import { PDFFileInput } from './PDFFileInput';
@@ -84,53 +85,104 @@ export function PDFViewer() {
 
   return (
     <DrawingProvider drawingState={drawingState}>
-      <div className="flex flex-col h-screen bg-gray-50">
-        {/* Header with file input and drawing toolbar */}
-        <header className="bg-white border-b border-gray-200 p-4 shadow-sm">
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center gap-4">
-              <div className="flex-1">
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg-app)' }}>
+        {/* Modern Header */}
+        <header style={{
+          background: 'var(--bg-surface)',
+          borderBottom: `1px solid var(--border)`,
+          padding: '1rem',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+        }}>
+          {/* Left: App name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: '32px', height: '32px', background: 'var(--accent)', borderRadius: '0.375rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+              📄
+            </div>
+            <h1 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              PDF Sign
+            </h1>
+          </div>
+
+          {/* Center: File input and toolbar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+            {pdfDocument && !pdfDocument.error && (
+              <>
                 <PDFFileInput
                   onSelect={actions.selectFile}
                   isLoading={viewerState.isLoading}
                   error={viewerState.error}
+                  fileName={pdfDocument?.fileName}
+                  showButton={true}
                 />
-              </div>
-              {pdfDocument && !pdfDocument.error && drawingState.hasDrawings && (
-                <button
-                  onClick={() => {
-                    drawingState.savePDF(pdfDocument);
-                  }}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors whitespace-nowrap flex items-center gap-2"
-                  title="Save PDF with drawings"
-                >
-                  💾 Save PDF
-                </button>
-              )}
-            </div>
-            {pdfDocument && !pdfDocument.error && (
-              <DrawingToolbar
-                isDrawingEnabled={drawingState.isDrawingEnabled}
-                onToggleDrawing={drawingState.toggleDrawing}
-                currentColor={drawingState.currentColor}
-                onColorChange={drawingState.setCurrentColor}
-                currentWidth={drawingState.currentWidth}
-                onWidthChange={drawingState.setCurrentWidth}
-                canUndo={drawingState.canUndo}
-                canRedo={drawingState.canRedo}
-                onUndo={drawingState.undo}
-                onRedo={drawingState.redo}
-                onClearPage={drawingState.clearPage}
+                <div style={{ width: '1px', height: '1.5rem', background: 'var(--border)' }} />
+              </>
+            )}
+            {(!pdfDocument || pdfDocument.error) && (
+              <PDFFileInput
+                onSelect={actions.selectFile}
+                isLoading={viewerState.isLoading}
+                error={viewerState.error}
+                fileName={null}
+                showButton={false}
               />
             )}
+            {pdfDocument && !pdfDocument.error && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <DrawingToolbar
+                  isDrawingEnabled={drawingState.isDrawingEnabled}
+                  onToggleDrawing={drawingState.toggleDrawing}
+                  currentColor={drawingState.currentColor}
+                  onColorChange={drawingState.setCurrentColor}
+                  currentWidth={drawingState.currentWidth}
+                  onWidthChange={drawingState.setCurrentWidth}
+                  canUndo={drawingState.canUndo}
+                  canRedo={drawingState.canRedo}
+                  onUndo={drawingState.undo}
+                  onRedo={drawingState.redo}
+                  onClearPage={drawingState.clearPage}
+                />
+              </div>
+            )}
           </div>
+
+          {/* Right: Save button */}
+          {pdfDocument && !pdfDocument.error && drawingState.hasDrawings && (
+            <button
+              onClick={() => {
+                drawingState.savePDF(pdfDocument);
+              }}
+              style={{
+                background: 'var(--success)',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                border: 'none',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: 500,
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
+              onMouseLeave={(e) => (e.target.style.opacity = '1')}
+              title="Save PDF with drawings"
+            >
+              <Save size={16} />
+              Save
+            </button>
+          )}
         </header>
 
       {/* Main content area with thumbnails sidebar */}
       {pdfDocument && !pdfDocument.error ? (
-        <div className="flex flex-1 overflow-hidden">
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Thumbnail sidebar */}
-          <div className="w-32 flex-shrink-0 flex flex-col">
+          <div style={{ width: '160px', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
             <ThumbnailPanel
               pdfDocument={pdfDocument}
               currentPage={viewerState.currentPage}
@@ -144,9 +196,9 @@ export function PDFViewer() {
           </div>
 
           {/* Main content */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {/* Single Page View - scrollable container */}
-            <div ref={containerRef} className="flex-1 overflow-auto">
+            <div ref={containerRef} style={{ flex: 1, overflow: 'auto' }}>
               <PDFCanvas
                 pdfDocument={pdfDocument}
                 currentPage={viewerState.currentPage}
@@ -167,17 +219,55 @@ export function PDFViewer() {
           </div>
         </div>
       ) : pdfDocument?.error ? (
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <h2 className="text-2xl font-semibold text-red-600 mb-2">Error Loading PDF</h2>
-            <p className="text-gray-600">{pdfDocument.error}</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem' }}>
+          <div style={{
+            background: 'var(--danger-light)',
+            border: `1px solid #fecaca`,
+            borderRadius: '0.5rem',
+            padding: '2rem',
+            maxWidth: '400px',
+            textAlign: 'center',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+              <AlertCircle size={40} color="var(--danger)" />
+            </div>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--danger)', margin: '0.5rem 0' }}>
+              Error Loading PDF
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', margin: '0.5rem 0 0 0' }}>
+              {pdfDocument.error}
+            </p>
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <h2 className="text-2xl font-semibold text-gray-400 mb-2">No PDF Loaded</h2>
-            <p className="text-gray-500">Select a file to view</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem' }}>
+          <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+              <FileText size={48} color="var(--text-muted)" />
+            </div>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-muted)', margin: '0.5rem 0' }}>
+              No PDF Loaded
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', margin: '0.5rem 0 1.5rem 0' }}>
+              Select a PDF file to get started
+            </p>
+            <button
+              onClick={() => document.querySelector('input[type="file"]').click()}
+              style={{
+                background: 'var(--accent)',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                border: 'none',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+                fontWeight: 500,
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => (e.target.style.background = 'var(--accent-hover)')}
+              onMouseLeave={(e) => (e.target.style.background = 'var(--accent)')}
+            >
+              Open PDF
+            </button>
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * PDF page navigation component
@@ -22,34 +23,82 @@ export function PDFPageNav({ currentPage, totalPages, onPreviousPage, onNextPage
   const isLastPage = currentPage === totalPages;
 
   return (
-    <div className="flex items-center justify-center gap-4 bg-white border-t border-gray-200 p-4">
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '1rem',
+      background: 'var(--bg-surface)',
+      borderTop: `1px solid var(--border)`,
+      padding: '1rem',
+    }}>
       <button
         onClick={onPreviousPage}
         disabled={isFirstPage}
-        className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Previous page"
+        style={{
+          background: isFirstPage ? 'var(--bg-sidebar)' : 'var(--bg-surface)',
+          color: isFirstPage ? 'var(--text-muted)' : 'var(--text-secondary)',
+          border: `1px solid var(--border)`,
+          borderRadius: '0.375rem',
+          padding: '0.5rem',
+          cursor: isFirstPage ? 'not-allowed' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'all 200ms ease',
+          opacity: isFirstPage ? 0.5 : 1,
+        }}
+        onMouseEnter={(e) => !isFirstPage && (e.target.style.background = 'var(--bg-sidebar)')}
+        onMouseLeave={(e) => (e.target.style.background = 'var(--bg-surface)')}
       >
-        ← Previous
+        <ChevronLeft size={20} />
       </button>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">Page</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '140px' }}>
         <input
           type="number"
           min="1"
           max={totalPages}
           value={currentPage}
           onChange={handlePageInput}
-          className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+          style={{
+            width: '3rem',
+            padding: '0.375rem 0.5rem',
+            border: `1px solid var(--border)`,
+            borderRadius: '0.375rem',
+            textAlign: 'center',
+            fontSize: '0.875rem',
+            background: 'var(--bg-sidebar)',
+            color: 'var(--text-primary)',
+            fontWeight: 500,
+          }}
+          title="Go to page"
         />
-        <span className="text-sm font-medium">of {totalPages}</span>
+        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+          of {totalPages}
+        </span>
       </div>
 
       <button
         onClick={onNextPage}
         disabled={isLastPage}
-        className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Next page"
+        style={{
+          background: isLastPage ? 'var(--bg-sidebar)' : 'var(--bg-surface)',
+          color: isLastPage ? 'var(--text-muted)' : 'var(--text-secondary)',
+          border: `1px solid var(--border)`,
+          borderRadius: '0.375rem',
+          padding: '0.5rem',
+          cursor: isLastPage ? 'not-allowed' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'all 200ms ease',
+          opacity: isLastPage ? 0.5 : 1,
+        }}
+        onMouseEnter={(e) => !isLastPage && (e.target.style.background = 'var(--bg-sidebar)')}
+        onMouseLeave={(e) => (e.target.style.background = 'var(--bg-surface)')}
       >
-        Next →
+        <ChevronRight size={20} />
       </button>
     </div>
   );

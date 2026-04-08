@@ -51,7 +51,7 @@ export function LineWidthSelector({ currentWidth, onWidthChange }) {
             style={{ width: '60%', height: `${currentWidth}px` }}
           />
         </div>
-        <span className="text-sm font-medium">Width</span>
+        <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Width</span>
       </button>
 
       {isOpen && (
@@ -75,12 +75,12 @@ export function LineWidthSelector({ currentWidth, onWidthChange }) {
                   style={{
                     width: '60%',
                     height: `${option.value}px`,
-                    backgroundColor: '#000',
+                    backgroundColor: 'var(--text-primary)',
                   }}
                 />
               </div>
-              <span>
-                {option.name} ({option.value}px)
+              <span style={{ fontSize: '0.875rem' }}>
+                {option.name}
               </span>
             </button>
           ))}

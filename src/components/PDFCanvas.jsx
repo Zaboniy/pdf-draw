@@ -41,8 +41,17 @@ export function PDFCanvas({ pdfDocument, currentPage, zoomLevel, onNumPagesChang
   };
 
   return (
-    <div className="flex justify-center items-center p-4 bg-gray-100 min-h-[calc(100vh-8rem)] overflow-auto">
-      <div className="relative" ref={containerRef}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '1rem',
+      background: 'var(--bg-canvas)',
+      minHeight: 'calc(100vh - 8rem)',
+      overflow: 'auto',
+      boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.05)',
+    }}>
+      <div style={{ position: 'relative' }} ref={containerRef}>
         <Document
           file={pdfDocument.file}
           onLoadSuccess={onLoadSuccess}

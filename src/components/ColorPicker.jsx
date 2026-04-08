@@ -5,16 +5,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-// Predefined color palette with standard markup colors
+// Modern color palette with more refined hues
 const COLOR_PALETTE = [
-  { name: 'Red', hex: '#FF0000' },
-  { name: 'Blue', hex: '#0000FF' },
-  { name: 'Green', hex: '#00AA00' },
-  { name: 'Yellow', hex: '#FFFF00' },
-  { name: 'Orange', hex: '#FFA500' },
-  { name: 'Purple', hex: '#800080' },
+  { name: 'Red', hex: '#ef4444' },
+  { name: 'Orange', hex: '#f97316' },
+  { name: 'Amber', hex: '#eab308' },
+  { name: 'Green', hex: '#22c55e' },
+  { name: 'Blue', hex: '#3b82f6' },
+  { name: 'Purple', hex: '#a855f7' },
+  { name: 'Pink', hex: '#ec4899' },
   { name: 'Black', hex: '#000000' },
-  { name: 'White', hex: '#FFFFFF' },
 ];
 
 export function ColorPicker({ currentColor, onColorChange }) {
@@ -38,7 +38,7 @@ export function ColorPicker({ currentColor, onColorChange }) {
     setIsOpen(false);
   };
 
-  const currentColorName = COLOR_PALETTE.find((c) => c.hex === currentColor)?.name || 'Custom';
+  const currentColorName = COLOR_PALETTE.find((c) => c.hex.toLowerCase() === currentColor.toLowerCase())?.name || 'Custom';
 
   return (
     <div ref={dropdownRef} className="color-picker-dropdown">
@@ -54,7 +54,7 @@ export function ColorPicker({ currentColor, onColorChange }) {
           className="color-preview"
           style={{ backgroundColor: currentColor }}
         />
-        <span className="text-sm font-medium">Color</span>
+        <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>Color</span>
       </button>
 
       {isOpen && (
@@ -66,12 +66,15 @@ export function ColorPicker({ currentColor, onColorChange }) {
           {COLOR_PALETTE.map((color) => (
             <button
               key={color.hex}
-              className={`color-option ${currentColor === color.hex ? 'selected' : ''}`}
-              style={{ backgroundColor: color.hex }}
+              className={`color-option ${currentColor.toLowerCase() === color.hex.toLowerCase() ? 'selected' : ''}`}
+              style={{
+                backgroundColor: color.hex,
+                border: currentColor.toLowerCase() === color.hex.toLowerCase() ? '3px solid var(--accent)' : '2px solid var(--border)',
+              }}
               onClick={() => handleColorSelect(color.hex)}
               title={color.name}
               aria-label={`${color.name} (${color.hex})`}
-              aria-current={currentColor === color.hex ? 'true' : 'false'}
+              aria-current={currentColor.toLowerCase() === color.hex.toLowerCase() ? 'true' : 'false'}
               role="menuitem"
             />
           ))}

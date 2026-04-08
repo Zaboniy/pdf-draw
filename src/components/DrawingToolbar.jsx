@@ -3,6 +3,7 @@
  * Integrates drawing controls: toggle, color picker, line width selector, undo/redo, clear
  */
 
+import { Pencil, CheckCircle, RotateCcw, RotateCw, Trash2 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { LineWidthSelector } from './LineWidthSelector';
 
@@ -29,7 +30,17 @@ export function DrawingToolbar({
         aria-label={isDrawingEnabled ? 'Stop drawing mode' : 'Start drawing mode'}
         aria-pressed={isDrawingEnabled}
       >
-        {isDrawingEnabled ? '✓ Drawing' : '✏️ Draw'}
+        {isDrawingEnabled ? (
+          <>
+            <CheckCircle size={16} />
+            Drawing
+          </>
+        ) : (
+          <>
+            <Pencil size={16} />
+            Draw
+          </>
+        )}
       </button>
 
       {/* Separator */}
@@ -53,7 +64,7 @@ export function DrawingToolbar({
           title="Undo last stroke (Ctrl+Z)"
           aria-label="Undo"
         >
-          ↶
+          <RotateCcw size={16} />
         </button>
         <button
           className="redo-btn"
@@ -62,7 +73,7 @@ export function DrawingToolbar({
           title="Redo last undone stroke (Ctrl+Y)"
           aria-label="Redo"
         >
-          ↷
+          <RotateCw size={16} />
         </button>
       </div>
 
@@ -73,7 +84,8 @@ export function DrawingToolbar({
         title="Clear all drawings on this page"
         aria-label="Clear page"
       >
-        🗑️ Clear
+        <Trash2 size={16} />
+        Clear
       </button>
 
       {/* Drawing Status Indicator */}
