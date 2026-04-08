@@ -1,6 +1,17 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+const styles = `
+  input[type="number"].page-input::-webkit-outer-spin-button,
+  input[type="number"].page-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"].page-input {
+    -moz-appearance: textfield;
+  }
+`;
+
 /**
  * PDF page navigation component
  *
@@ -12,6 +23,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * - onGoToPage: function - Callback for page number input
  */
 export function PDFPageNav({ currentPage, totalPages, onPreviousPage, onNextPage, onGoToPage }) {
+  React.useEffect(() => {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = styles;
+    document.head.appendChild(styleEl);
+    return () => styleEl.remove();
+  }, []);
+
   const handlePageInput = (e) => {
     const page = parseInt(e.target.value, 10);
     if (!isNaN(page) && page > 0 && page <= totalPages) {
@@ -57,12 +75,13 @@ export function PDFPageNav({ currentPage, totalPages, onPreviousPage, onNextPage
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '140px' }}>
         <input
           type="number"
+          className="page-input"
           min="1"
           max={totalPages}
           value={currentPage}
           onChange={handlePageInput}
           style={{
-            width: '3.5rem',
+            width: '3rem',
             padding: '0.375rem 0.5rem',
             border: `1px solid var(--border)`,
             borderRadius: '0.375rem',
