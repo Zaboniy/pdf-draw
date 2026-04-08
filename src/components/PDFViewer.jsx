@@ -97,30 +97,60 @@ export function PDFViewer() {
           justifyContent: 'space-between',
           gap: '1rem',
         }}>
-          {/* Left: App name */}
+          {/* Left: App name and filename */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div style={{ width: '32px', height: '32px', background: 'var(--accent)', borderRadius: '0.375rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+            <div
+              onClick={() => document.querySelector('input[type="file"]').click()}
+              style={{
+                width: '32px',
+                height: '32px',
+                background: 'var(--accent)',
+                borderRadius: '0.375rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => (e.target.style.opacity = '0.8')}
+              onMouseLeave={(e) => (e.target.style.opacity = '1')}
+              title="Open PDF"
+            >
               📄
             </div>
             <h1 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
               PDF Sign
             </h1>
+            {pdfDocument && !pdfDocument.error && (
+              <p style={{ margin: 0, marginLeft: '0.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '300px' }}>
+                📄 {pdfDocument.fileName}
+              </p>
+            )}
           </div>
 
-          {/* Center: File input and toolbar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+          {/* Center: Drawing toolbar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flex: 1 }}>
             {pdfDocument && !pdfDocument.error && (
-              <>
-                <PDFFileInput
-                  onSelect={actions.selectFile}
-                  isLoading={viewerState.isLoading}
-                  error={viewerState.error}
-                  fileName={pdfDocument?.fileName}
-                  showButton={true}
-                />
-                <div style={{ width: '1px', height: '1.5rem', background: 'var(--border)' }} />
-              </>
+              <DrawingToolbar
+                isDrawingEnabled={drawingState.isDrawingEnabled}
+                onToggleDrawing={drawingState.toggleDrawing}
+                currentColor={drawingState.currentColor}
+                onColorChange={drawingState.setCurrentColor}
+                currentWidth={drawingState.currentWidth}
+                onWidthChange={drawingState.setCurrentWidth}
+                canUndo={drawingState.canUndo}
+                canRedo={drawingState.canRedo}
+                onUndo={drawingState.undo}
+                onRedo={drawingState.redo}
+                onClearPage={drawingState.clearPage}
+              />
             )}
+          </div>
+
+          {/* Right: Save button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {(!pdfDocument || pdfDocument.error) && (
               <PDFFileInput
                 onSelect={actions.selectFile}
@@ -131,51 +161,43 @@ export function PDFViewer() {
               />
             )}
             {pdfDocument && !pdfDocument.error && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <DrawingToolbar
-                  isDrawingEnabled={drawingState.isDrawingEnabled}
-                  onToggleDrawing={drawingState.toggleDrawing}
-                  currentColor={drawingState.currentColor}
-                  onColorChange={drawingState.setCurrentColor}
-                  currentWidth={drawingState.currentWidth}
-                  onWidthChange={drawingState.setCurrentWidth}
-                  canUndo={drawingState.canUndo}
-                  canRedo={drawingState.canRedo}
-                  onUndo={drawingState.undo}
-                  onRedo={drawingState.redo}
-                  onClearPage={drawingState.clearPage}
+              <>
+                <PDFFileInput
+                  onSelect={actions.selectFile}
+                  isLoading={viewerState.isLoading}
+                  error={viewerState.error}
+                  fileName={null}
+                  showButton={false}
                 />
-              </div>
+                {drawingState.hasDrawings && (
+                  <button
+                    onClick={() => {
+                      drawingState.savePDF(pdfDocument);
+                    }}
+                    style={{
+                      background: 'var(--success)',
+                      color: 'white',
+                      padding: '0.5rem 1rem',
+                      border: 'none',
+                      borderRadius: '0.375rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      fontWeight: 500,
+                      transition: 'all 200ms ease',
+                    }}
+                    onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
+                    onMouseLeave={(e) => (e.target.style.opacity = '1')}
+                    title="Save PDF with drawings"
+                  >
+                    <Save size={16} />
+                    Save
+                  </button>
+                )}
+              </>
             )}
           </div>
-
-          {/* Right: Save button */}
-          {pdfDocument && !pdfDocument.error && drawingState.hasDrawings && (
-            <button
-              onClick={() => {
-                drawingState.savePDF(pdfDocument);
-              }}
-              style={{
-                background: 'var(--success)',
-                color: 'white',
-                padding: '0.5rem 1rem',
-                border: 'none',
-                borderRadius: '0.375rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontWeight: 500,
-                transition: 'all 200ms ease',
-              }}
-              onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
-              onMouseLeave={(e) => (e.target.style.opacity = '1')}
-              title="Save PDF with drawings"
-            >
-              <Save size={16} />
-              Save
-            </button>
-          )}
         </header>
 
       {/* Main content area with thumbnails sidebar */}
