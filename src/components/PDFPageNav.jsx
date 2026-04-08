@@ -62,7 +62,7 @@ export function PDFPageNav({ currentPage, totalPages, onPreviousPage, onNextPage
           value={currentPage}
           onChange={handlePageInput}
           style={{
-            width: '3rem',
+            width: '3.5rem',
             padding: '0.375rem 0.5rem',
             border: `1px solid var(--border)`,
             borderRadius: '0.375rem',
