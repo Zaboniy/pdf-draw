@@ -1,21 +1,15 @@
-# PDF Viewer with Drawing Annotation Tool
+# PDF Sign
 
-A React-based PDF viewer with integrated drawing and annotation capabilities. Supports both single-page and continuous book view modes with full undo/redo functionality.
+A Chrome extension (MV3) for viewing and annotating PDFs — freehand drawing, selection, copy/paste, and thumbnail navigation, all client-side.
 
 ## Features
 
-### Core Features
-- **PDF Viewing**: Display PDF documents in single-page or book view modes
-- **Drawing Annotation**: Draw freehand lines and annotations directly on PDF pages
-- **Color Selection**: Choose from 8 predefined colors (Red, Blue, Green, Yellow, Orange, Purple, Black, White)
-- **Line Width Control**: Select from 3 preset line widths (Thin, Medium, Thick)
-- **Undo/Redo**: Unlimited undo/redo history with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
-- **Multi-page Support**: Each PDF page maintains independent drawing layers
-
-### Viewing Modes
-- **Single Page View**: View one page at a time with navigation controls
-- **Book View**: Continuous scrolling through all pages with automatic page navigation
-- **Drawing in All Modes**: Draw annotations in both single-page and book view modes
+- **PDF Viewing**: Open a PDF via file picker, or from the active browser tab when launched as an extension
+- **Drawing Annotation**: Freehand strokes with 8 colors and 3 line widths
+- **Select / Move / Copy / Paste**: Select a stroke (highlighted with a contour), drag to reposition, copy and paste across pages
+- **Undo/Redo**: Unlimited per-page history (Ctrl+Z / Ctrl+Y)
+- **Thumbnail Panel**: Page thumbnails with drawing overlays and click-to-jump navigation
+- **Multi-page Support**: Each page maintains an independent drawing layer
 
 ## Getting Started
 
@@ -25,152 +19,97 @@ A React-based PDF viewer with integrated drawing and annotation capabilities. Su
 npm install
 ```
 
-### Running the App
+### Running as a Web App
 
 ```bash
-npm start
+npm run dev
 ```
 
-The application will start on `http://localhost:3000`
-
-### Building for Production
+### Building the Extension
 
 ```bash
 npm run build
 ```
 
+Then in Chrome: go to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `dist/` folder.
+
+Click the toolbar icon to open the viewer in a new tab. If the active tab is showing a PDF, its bytes are pre-fetched by the service worker and handed to the viewer automatically.
+
 ## Usage
 
 ### Loading a PDF
-1. Click on the file input field in the header
-2. Select a PDF file from your computer
-3. The PDF will load and display
+1. Click the file input in the header, or
+2. Open the extension while a PDF is the active tab — it loads automatically
 
-### Drawing on PDF Pages
-1. Click the **Draw** button to activate drawing mode (button will highlight in blue)
-2. Click and drag on the PDF to draw freehand lines
-3. Use the toolbar to:
-   - **Select Color**: Click the color button to choose a pen color
-   - **Select Width**: Click the width button to adjust line thickness
-   - **Undo/Redo**: Use the ↶ and ↷ buttons or press Ctrl+Z / Ctrl+Y
-   - **Clear Page**: Click the 🗑️ button to erase all drawings on current page
+### Drawing
+1. Click **Draw** to activate drawing mode
+2. Click and drag on the page to draw a freehand stroke
+3. Use the toolbar to pick color, line width, undo/redo, or clear the page
+
+### Selecting, Moving, Copying
+1. Click a stroke to select it (shown with a contour)
+2. Drag to reposition
+3. Ctrl+C / Ctrl+V to copy and paste onto the current page
 
 ### Navigation
-- **Single Page View**: Use arrow keys or scroll wheel to move between pages
-- **Book View**: Scroll to navigate through pages
-- **View Mode**: Click the view mode button (📖 Book View / 📄 Single Page) to switch modes
+- Arrow keys / scroll to move between pages
+- Click a thumbnail in the side panel to jump to that page
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| Ctrl+Z | Undo last drawing action |
-| Ctrl+Y | Redo last undone action |
-| Arrow Right / Space | Next page (single page view) |
-| Arrow Left | Previous page (single page view) |
+| Ctrl+Z | Undo |
+| Ctrl+Y | Redo |
+| Ctrl+C | Copy selected stroke |
+| Ctrl+V | Paste stroke |
+| Arrow Right / Space | Next page |
+| Arrow Left | Previous page |
 
 ## Project Structure
 
 ```
 src/
+├── background.js                  # MV3 service worker: detects active-tab PDFs, pre-fetches bytes
 ├── components/
-│   ├── DrawingCanvas.jsx          # Canvas overlay for drawing
+│   ├── App.jsx                    # Root component
+│   ├── PDFViewer.jsx              # Main viewer, tab-hint handling, keyboard shortcuts
+│   ├── PDFCanvas.jsx              # Single page PDF renderer
+│   ├── PDFFileInput.jsx           # File upload input
+│   ├── PDFPageNav.jsx             # Page navigation controls
+│   ├── ThumbnailPanel.jsx         # Page thumbnails with drawing overlays
+│   ├── DrawingCanvas.jsx          # Canvas overlay for drawing/selection
 │   ├── DrawingContext.jsx         # React Context for drawing state
 │   ├── DrawingErrorBoundary.jsx   # Error boundary for drawing
 │   ├── DrawingToolbar.jsx         # Drawing controls toolbar
 │   ├── ColorPicker.jsx            # Color selection dropdown
-│   ├── LineWidthSelector.jsx      # Line width selection dropdown
-│   ├── PDFCanvas.jsx              # Single page PDF renderer
-│   ├── BookView.jsx               # Book view PDF renderer
-│   ├── PDFViewer.jsx              # Main viewer component
-│   ├── PDFFileInput.jsx           # File upload input
-│   ├── PDFPageNav.jsx             # Page navigation controls
-│   └── App.jsx                    # Root component
+│   └── LineWidthSelector.jsx      # Line width selection dropdown
 ├── hooks/
-│   ├── useDrawing.js              # Drawing state management hook
-│   └── usePDFViewer.js            # PDF viewer state hook
-├── utils/
-│   ├── drawingUtils.js            # Canvas rendering utilities
-│   └── ...
-└── styles/
-    ├── drawing.css                # Drawing component styles
-    └── ...
+│   ├── useDrawing.js              # Drawing/selection/copy-paste state management
+│   └── usePDFViewer.js            # PDF document + page state, extension byte loading
+└── utils/
+    └── drawingUtils.js            # Canvas rendering utilities
 ```
 
 ## Technical Stack
 
-- **Frontend**: React 18+, ES6+ JavaScript
-- **PDF Rendering**: react-pdf with pdfjs-dist
-- **Styling**: Tailwind CSS
-- **Canvas**: HTML5 Canvas API for drawing
-- **State Management**: React Hooks (useState, useRef, useContext)
+- **Frontend**: React 19, ES6+ JavaScript (no TypeScript)
+- **Build**: Vite 8, vite-plugin-web-extension
+- **PDF Rendering**: react-pdf / pdfjs-dist
+- **PDF Writing**: pdf-lib
+- **Styling**: Tailwind CSS 4
+- **Icons**: lucide-react
+- **Extension**: Manifest V3
 
-## Features & Capabilities
+## Persistence
 
-### Drawing
-- Real-time stroke rendering as you draw
-- Smooth line drawing with anti-aliasing
-- Multiple stroke support (draw multiple lines on same page)
-- Touch and mouse input support
-
-### Undo/Redo
-- Per-page unlimited undo/redo stacks
-- Memory-efficient state management
-- Keyboard shortcut support (Ctrl+Z/Y)
-
-### Persistence
-- Session-based drawing persistence (data persists during current session)
-- Per-page drawing layers (each page has independent drawing state)
-- Drawings persist when switching between view modes
-
-### Book View
-- Automatic page detection based on cursor position
-- Draw annotations across multiple visible pages
-- Continuous scrolling with drawing support
-
-## Accessibility
-
-- Semantic HTML (proper button elements, ARIA labels)
-- Keyboard navigation support
-- Focus states for all interactive elements
-- Color-independent visual feedback
-
-## Browser Support
-
-Tested and working in:
-- Chrome/Chromium (latest)
-- Firefox (latest)
-- Safari (latest)
-
-## Development
-
-### Running Tests
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
-```
+Session-only, in-memory state — drawings do not persist across page reloads or beyond the current session.
 
 ## Known Limitations
 
-- Drawing persistence is session-only (no save to file)
-- Drawing does not persist after page reload
-- Stylus/pen input optimization is out of scope for v1
-- Professional design features (layers, gradients, etc.) are out of scope
-
-## Future Enhancements
-
-- Export drawings as image or PDF
-- Permanent drawing persistence (save/load)
-- Drawing layers and transparency
-- Freeform shapes and text annotations
-- Drawing eraser tool
-- Customizable color palette
+- No save/export of annotated PDFs yet
+- No persistence across reloads
+- Stylus/pen input optimization out of scope
 
 ## License
 
