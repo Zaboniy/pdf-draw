@@ -260,6 +260,7 @@ export function PDFViewer() {
             <ThumbnailPanel
               pdfDocument={pdfDocument}
               currentPage={viewerState.currentPage}
+              zoomLevel={viewerState.zoomLevel}
               onPageSelect={actions.goToPage}
               onLoadSuccess={(pdf) => {
                 if (actions.setNumPages) {
