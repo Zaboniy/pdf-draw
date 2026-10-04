@@ -15,10 +15,50 @@ import { DrawingProvider } from './DrawingContext';
  * Manages PDF document state, coordinates child components, and provides
  * scroll and keyboard navigation support for page changes
  */
+const TAB_PDF_HINT_KEY = 'tabPDFHint';
+const HINT_TTL_MS = 30_000;
+
 export function PDFViewer() {
   const { pdfDocument, viewerState, actions } = usePDFViewer();
   const drawingState = useDrawing();
   const containerRef = useRef(null);
+
+  // On mount: check if the extension service worker stored a PDF hint from an active tab.
+  // Guard ensures this only runs in extension context (chrome.storage.session is defined).
+  useEffect(() => {
+    const isExtension = typeof chrome !== 'undefined' && chrome?.storage?.session;
+    if (!isExtension) return;
+
+    chrome.storage.session.get(TAB_PDF_HINT_KEY, async (result) => {
+      const hint = result[TAB_PDF_HINT_KEY];
+      if (!hint || Date.now() - hint.timestamp > HINT_TTL_MS) {
+        // No valid hint — show the normal file upload prompt (no action needed)
+        chrome.storage.session.remove(TAB_PDF_HINT_KEY);
+        return;
+      }
+
+      chrome.storage.session.remove(TAB_PDF_HINT_KEY);
+
+      try {
+        let bytes;
+        if (hint.pdfBytes) {
+          // Bytes were pre-fetched by the service worker
+          bytes = new Uint8Array(hint.pdfBytes);
+        } else {
+          // Service worker couldn't fetch — try from the tab context
+          const response = await fetch(hint.url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          bytes = new Uint8Array(await response.arrayBuffer());
+        }
+
+        const fileName = hint.url.split('/').pop().split('?')[0] || 'document.pdf';
+        await actions.loadFromBytes(bytes, fileName);
+      } catch (err) {
+        console.warn('Could not load PDF from tab URL:', err);
+        // Fall through — file upload prompt shown normally
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle scroll wheel and keyboard navigation
   useEffect(() => {

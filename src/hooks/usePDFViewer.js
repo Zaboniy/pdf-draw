@@ -159,6 +159,37 @@ export function usePDFViewer() {
   };
 
   /**
+   * Load a PDF from raw bytes (Uint8Array or ArrayBuffer).
+   * Used when importing a PDF from an active browser tab via the extension.
+   */
+  const loadFromBytes = async (bytes, fileName) => {
+    setViewerState((prev) => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const file = new File([blob], fileName || 'document.pdf', { type: 'application/pdf' });
+      setPdfDocument({
+        file,
+        numPages: 0,
+        fileName: fileName || 'document.pdf',
+        loadedAt: new Date().toISOString(),
+      });
+      setViewerState({
+        currentPage: 1,
+        zoomLevel: 1.0,
+        isLoading: false,
+        error: null,
+        rotation: 0,
+        viewMode: 'single',
+      });
+    } catch (err) {
+      const errorMsg = 'Failed to load PDF from browser tab.';
+      setPdfDocument({ error: errorMsg });
+      setViewerState((prev) => ({ ...prev, isLoading: false, error: errorMsg }));
+      console.error('Tab PDF load error:', err);
+    }
+  };
+
+  /**
    * Clear loaded PDF and reset to initial state
    */
   const clearFile = () => {
@@ -201,6 +232,7 @@ export function usePDFViewer() {
     viewerState,
     actions: {
       selectFile,
+      loadFromBytes,
       goNextPage,
       goPreviousPage,
       goToPage,
